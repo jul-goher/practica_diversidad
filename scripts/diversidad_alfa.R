@@ -16,8 +16,10 @@ shan_pielou <- function(x) { {
   r_shannon <- round (shannon, 2)
   r_pielou <- round (pielou, 2)
   
-  print(paste("Índice de Shannon: ", r_shannon))
-  print(paste("Índice de Pielou: ", r_pielou))
+  return ( 
+    list (shannon = r_shannon,
+          pielou = r_pielou) 
+  )
 
 }
 
@@ -32,7 +34,7 @@ simpson <- function (x) {
   
   r_simpson <- round(simpson, 2)
   
-  print(paste("Índice de Simpson: ", r_simpson))
+  return (r_simpson)
 }
 
 
@@ -42,11 +44,11 @@ chao1 <- function (x) {
   f1 <- sum (x == 1)
   f2 <- sum (x == 2)
   
-  chao1 <- s_obs + ( f1^2 / ( 2* f2) )
+  chao1 <- s_obs + ( f1^2 / ( 2 * f2) )
   
   r_chao1 <- round (chao1, 2)
  
- print(paste("Índice de CHAO1: ", r_chao1))      
+ return (r_chao1)
  
 }
 
@@ -60,6 +62,30 @@ shan_pielou (pob1_abundancias)
 simpson (pob1_abundancias)
 chao1 (pob1_abundancias)
 
+
+
+####            Población 2 - carita feliz
+
+
+####            Población 1 - 
+
+
+
+#################### TABLA DE ÍNDICES ALFA ###########################
+
+#Función que haga una data.frame con los índices calculados 
+indices_alfa <- function (x) {
+  data.frame (
+    shannon = shan_pielou(x)$shannon, 
+    pielou = shan_pielou(x)$pielou, 
+    simpson = simpson (x), 
+    chao1 = chao1(x)
+  )
+}
+indices_alfa(pob1_abundancias)
+
+
+#Prototipo función basurita :p
 pob1 <- data.frame(
   color = c("azul marino", "azul intermedio", "azul claro", "verde oscuro",
             "verde claro", "fucsia", "amarillo", "rosa", "naranja", "rojo",
@@ -68,15 +94,9 @@ pob1 <- data.frame(
   probabilidad =  for (i in 1:length(x)) { (x[i] / sum(x) )
   }
   shannon =  
-  simpson =
-  chao1 = 
+    simpson =
+    chao1 = 
 )
-
-
-####            Población 2 - carita feliz
-
-
-####            Población 1 - 
 
 
 
