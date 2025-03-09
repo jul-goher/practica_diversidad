@@ -10,9 +10,10 @@ shan_pielou <- function(x) { {
   for (i in 1:n) {
     shannon <- shannon + ( (-1) * ( (x[i] / total) * log(x[i] / total) ) ) #ciclo for para no limitar el número de especies
   }
-  
+  #Pielou 
   pielou <- shannon / (log(n)) #x tiene que ser necesariamente un vector !!
 }
+  #Redondeo de los índices
   r_shannon <- round (shannon, 2)
   r_pielou <- round (pielou, 2)
   
@@ -31,10 +32,21 @@ simpson <- function (x) {
   for (i in 1:length(x)) { #ya corregí el error 
     simpson <- simpson + ( (x[i] * (x[i] - 1) ) / ( N * (N - 1) ) )
   }
+  #Inverso de Simpson 
+  inv_simpson <- (1/simpson)
   
-  r_simpson <- round(simpson, 2)
+  #índice de Gini-Simpson
+  gini <- (1 - simpson)
   
-  return (r_simpson)
+  #Redondeo de los índices
+  r_simpson <- round (simpson, 2)
+  r_inv_simpson <- round (inv_simpson, 2)
+  r_gini <- round(gini, 2)
+  
+  return ( list (simpson = r_simpson, 
+                 inv_simpson = r_inv_simpson, 
+                 gini = r_gini)
+  )
 }
 
 
