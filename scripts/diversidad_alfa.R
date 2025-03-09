@@ -161,44 +161,33 @@ pob7_chao <- chao1(pob7)
 ############## ÍNDICES ALFA DE TODAS LAS POBLACIONES ####################
               ######################################
 
-indices_alpha <- data.frame ( list 
-( poblaciones <- c ("P1", "P2", "P3", "P4", "P5", "P6", "P7"), 
+#Elimine list, no corría con esa
+#Puse as.numeric porque creo que lo tomaba en cuenta como un vector aún y salían 7 columnas por cada index, en vez de 7 rows
 
-indices_shannon <- c ( pob1_shan$shannon, pob2_shan$shannon, pob3_shan$shannon, pob4_shan$shannon,
-                     pob5_shan$shannon, pob6_shan$shannon, pob7_shan$shannon ), 
-
-indices_pielou <- c ( pob1_shan$pielou, pob2_shan$pielou, pob3_shan$pielou, pob4_shan$pielou,
-                     pob5_shan$pielou, pob6_shan$pielou, pob7_shan$pielou ), 
-
-indices_simpson <-c ( pob1_simpson$simpson, pob2_simpson$simpson, pob3_simpson$simpson, pob4_simpson$simpson,
-                      pob5_simpson$simpson, pob6_simpson$simpson, pob7_simpson$simpson ), 
-
-indices_inverso <- c ( pob1_simpson$inv_simpson, pob2_simpson$inv_simpson, pob3_simpson$inv_simpson, pob4_simpson$inv_simpson,
-                       pob5_simpson$inv_simpson, pob6_simpson$inv_simpson, pob7_simpson$inv_simpson ), 
-
-indices_gini <- c ( pob1_simpson$gini, pob2_simpson$gini, pob3_simpson$gini, pob4_simpson$gini,
-                    pob5_simpson$gini, pob6_simpson$gini, pob7_simpson$gini ), 
-
-indices_chao1 <- c ( pob1_chao, pob2_chao, pob3_chao, pob4_chao, pob5_chao, pob6_chao, pob7_chao) 
- )
-) 
-
-indices_alpha
-
-#Cuando los hago por separado me hace un dta.frame muy confuso
-#Data.frame con los índices calculados 
-indices_alfa <- data.frame ( list (
-  poblaciones = poblaciones,
-  shannon = indices_shannon, 
-  pielou = indices_pielou, 
-  simpson = indices_simpson,
-  inverso_simpson = indices_inverso, 
-  gini = indices_gini, 
-  chao1 = indices_chao1
-  )
+indices_alpha <- data.frame( 
+  poblaciones = c("P1", "P2", "P3", "P4", "P5", "P6", "P7"), 
+  
+  shannon = as.numeric (c (pob1_shan$shannon, pob2_shan$shannon, pob3_shan$shannon, pob4_shan$shannon,
+                           pob5_shan$shannon, pob6_shan$shannon, pob7_shan$shannon) ), 
+  
+  pielou = as.numeric (c (pob1_shan$pielou, pob2_shan$pielou, pob3_shan$pielou, pob4_shan$pielou,
+                          pob5_shan$pielou, pob6_shan$pielou, pob7_shan$pielou) ), 
+  
+  simpson = as.numeric (c (pob1_simpson$simpson, pob2_simpson$simpson, pob3_simpson$simpson, pob4_simpson$simpson,
+                           pob5_simpson$simpson, pob6_simpson$simpson, pob7_simpson$simpson) ), 
+  
+  inv_simpson = as.numeric ( c (pob1_simpson$inv_simpson, pob2_simpson$inv_simpson, pob3_simpson$inv_simpson, pob4_simpson$inv_simpson,
+                                pob5_simpson$inv_simpson, pob6_simpson$inv_simpson, pob7_simpson$inv_simpson) ), 
+  
+  gini = as.numeric (c (pob1_simpson$gini, pob2_simpson$gini, pob3_simpson$gini, pob4_simpson$gini,
+                        pob5_simpson$gini, pob6_simpson$gini, pob7_simpson$gini) ), 
+  
+  chao1 = as.numeric (c (pob1_chao, pob2_chao, pob3_chao, pob4_chao, pob5_chao, pob6_chao, pob7_chao) )
 )
 
-print ( indices_alfa )
+print(indices_alpha) #Ahora sí imprime bien el data.frama
+
+
 
 
 
