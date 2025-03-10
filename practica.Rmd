@@ -270,7 +270,7 @@ Con estas gráficas podemos notar la heterogeneidad en cuanto a las abundancias 
 En la gráfica correspondiente a la población cuatro se puede notar una zona estable al inicio de la curva, donde se ve una asíntota, en la que podemos observar especies con una misma abundancia (especie 2, 3 y 4) y cercano a esta hay otras con un valor bastante cercano (1 y 5), aunque ya para resto de especies se nota una inclinación (caída) muy pronunciada, debido a la gran baja de individuos. En el caso de la población tres y seis únicamente notamos un punto, debido a que solo tienen una especie y pueden ser ambientes dominados por estas.
 
 En todas las poblaciones con más de una especie, notamos que la mayoria de las especies presentes son raras (que destacan en la gráfica por el color azul mas claro), es decir, que son poco abundantes (distribuciones de cola larga).
-
+*Índice de Jaccard
 ```{r Rank-abundance, echo=TRUE, message=FALSE, warning=FALSE}
 for (x in 1:7) {
   spp1 <- datos[x,c(1:14)] # Seleccionar poblacion
@@ -297,11 +297,157 @@ A partir de solo las curvas, podemos suponer que la población con mayor diversi
 
 ### *Índices de diversidad beta*
 
+Uso de una matriz con valores bolenos TRUE/FALSE como una matriz presencia ausencia para lograr sacar los
+índices de Jaccard entre pares de poblaciones y posterior a ello guardarlos en una matriz de distancias no simétrica. Se considero usar as.matrix para volverla simétrica o rellenarla manualmente, pero ya que se observa la diagonal llena de unos confirmando la igualdad entre p1 y p1, se decidió dejarla así, para evitar que marcar error por falta de datos al hacer la matriz. Se comparó con otra matriz (que se encuentra en el script) pero los resultados más hacertados eran con esta.
+
+*Índice de Jaccard*
+
+```{r jaccard, echo=FALSE}
+data<-read.csv("data/datos.csv")
+
+data1<-data[ ,c(2:13)]>0
+
+jaccard<-function(base){
+  ind_jaccard<-c(1)
+  
+  for (i in 2:nrow(base)){
+    i1<-sum(base[1,] & base[2:nrow(base),]==TRUE)
+    u1<-sum(base[i,]| base[2:nrow(base),]==TRUE)
+    r1<-c(i1/u1)
+    ind_jaccard<-c(ind_jaccard,r1)
+  }
+  ind_jaccard
+  
+  ind_jaccard2<-c(0,1)
+  for (a in 3:7) {
+    i2<-sum(base[2,] & base[3:nrow(base),]==TRUE)
+    u2<-sum(base[a,]| base[3:nrow(base),]==TRUE)
+    r2<-c(i2/u2)
+    ind_jaccard2<-c(ind_jaccard2,r2)
+  }
+  ind_jaccard2
+  
+  ind_jaccard3<-c(0,0,1)
+  for (b in 4:7) {
+    i3<-sum(base[3,] & base[4:nrow(base),]==TRUE)
+    u3<-sum(base[b,]| base[4:nrow(base),]==TRUE)
+    r3<-c(i3/u3)
+    ind_jaccard3<-c(ind_jaccard3,r3)
+  }
+  ind_jaccard3
+  
+  
+  ind_jaccard4<-c(0,0,0,1)
+  for (c in 5:7) {
+    i4<-sum(base[4,] & base[5:nrow(base),]==TRUE)
+    u4<-sum(base[c,]| base[5:nrow(base),]==TRUE)
+    r4<-c(i4/u4)
+    ind_jaccard4<-c(ind_jaccard4,r4)
+  }
+  ind_jaccard4
+  
+  ind_jaccard5<-c(0,0,0,0,1)
+  for (y in 6:7) {
+    i5<-sum(base[5,] & base[6:nrow(base),]==TRUE)
+    u5<-sum(base[y,]| base[6:nrow(base),]==TRUE)
+    r5<-c(i5/u5)
+    ind_jaccard5<-c(ind_jaccard5,r5)
+  }
+  ind_jaccard5
+  
+  ind_jaccard6<-c(0,0,0,0,0,1)
+  for (d in 7) {
+    i6<-sum(base[6,] & base[7:nrow(base),]==TRUE)
+    u6<-sum(base[d,]| base[7:nrow(base),]==TRUE)
+    r6<-c(i6/u6)
+    ind_jaccard6<-c(ind_jaccard6,r6)
+  }
+  ind_jaccard6
+  
+  ind_jaccard7<-c(0,0,0,0,0,0,1)
+  
+  mat_jaccard<-cbind(ind_jaccard,ind_jaccard2,ind_jaccard3,ind_jaccard4,ind_jaccard5,ind_jaccard6,ind_jaccard7)
+  mat_jaccard
+  rownames(mat_jaccard)<-c("p1","p2","p3","p4","p5","p6","p7")
+  colnames(mat_jaccard)<-c("p1","p2","p3","p4","p5","p6","p7")
+  
+  mat_jaccard##Matriz con los índices de Jaccard entre poblaciones
+}
+
+jaccard(data1)
+```
+*Índice de Bray-Curtis*
+
+Se realizó la comparación entre La matriz dada por el paquete *vegan* y una realizada manualmente.No se encontraron diferencias en los resultados.
+
+```{r Bray-Curtis, echo=FALSE}
+library(lattice)
+library(permute)
+library(vegan)
+
+datos<-data[ ,c(2:13)]
+datos
+
+#Matriz
+bd <- vegdist(datos, method = "bray")
+bd
+
+  bc<-function(datos){
+    
+    bray_curtis<-function(x,y){#Dado el conjunto x y el conjunto y
+      comunes<-names(datos)[x>0 & y>0]
+      ab_min_com<-sum(pmin(x[comunes],y[comunes]))
+      numerador<-2*ab_min_com
+      denominador<-sum(x)+sum(y)
+      brayc<-1-(numerador/denominador)
+    }
+    
+    ind_bc<-c()
+    for (i in 1:nrow(datos)){
+      for (j in 2:nrow(datos)) {
+        indice<-bray_curtis(datos[i, ],datos[j, ])
+        ind_bc<-c(ind_bc,indice)
+      }
+    }
+    print(ind_bc)
+    matd_bray_curtis<-matrix(ind_bc,nrow = 6,ncol = 6)
+    rownames(matd_bray_curtis)<-c("p2","p3","p4","p5","p6","p7")
+    colnames(matd_bray_curtis)<-c("p1","p2","p3","p4","p5","p6")
+    print(matd_bray_curtis)
+    
+  }
+  
+  bc(datos)
+
+```
+
 ## Discusión y conclusión
+
+En términos ecológicos, resulta difícil poder descifrar de manera precisa la cantidad de grupos (especies o una agrupación a diferente nivel taxonómico) posibles que existen en una población muy grande puesto que a partir de una muestra solo se pueden realizar estimaciones que sean lo más cercanas posibles al valor real del sistema completo. Una forma de resolver esto es mediante curvas de acumulación de especies, a partir de las cuales se reconoce como representativa una muestra cuando se alcanza una asíntota, en el que la cantidad de especies ya no aumenta y, por lo tanto, se dice que se alcanzó el máximo; pero este método puede llegar a ignorar especias raras debido a su baja probabilidad de captura/aparición. Generalmente en una comunidad suelen haber muchas especies con un bajo número de especies, por lo que en los muestreos no suelen estar representadas, de tal forma que la diversidad estimada es menor a su valor real (Escalante, T., 2003; Moreno, C. et al, 2011). 
+
+Para este problema también se pueden realizar curvas de rarefacción, sin embargo, estas son diferentes a las curvas acumulación de especies, puesto que las curvas de rarefacción se realizan a partir del cálculo de índices de diversidad  alfa de múltiples muestreos para tener un índice promedio comparable con el de otra comunidad, en el que es necesario que ambas comunidades tengan un mismo número de individuos (Carmona-Galindo V. & Carmona T., 2013); por lo que podemos decir que en este caso no se presentaron gráficas de este tipo y al realizar las curvas no se tuvo un mismo tamaño de muestras, ya que cada bolsa (población) contenía un número de fichas muy variado (el rango va de 38 a 86) que, en algunos casos, nos limitó en la cantidad de muestreos y el tamaño de estos al final (tenían menos fichas). 
+
+En las curvas de rango-abundancia se puede analizar la riqueza de especies (longitud de la curva), la homogeneidad de abundancias (la pendiente), el cambio de especies y la pérdida o ganancia de especies; las cuales abarcan las diversas formas en que las características de una población pueden cambiar. En estas curvas, dado que se representa la riqueza y equidad de las especies, al obtener un valor elevado para la equidad, lo más probable es que se termine formando una línea recta debido a la presencia de homogeneidad de abundancias que impiden la aparición de una pendiente. Su posición en Y dependerá de si su abundancia, aparte de ser homogénea, es alta o baja. En el caso de que ambos parámetros son muy bajos, se notara una pendiente muy pronunciada, lo cual es indicativo de que en dicho sistema hay dominancia de pocas especies (Carmona-Galindo V. & Carmona T., 2013; Meghan L., et al., 2019). Fenómeno que se pudo observar en las gráficas correspondientes a la población uno y siete. 
+
+Las curvas de rango-abundancia se suelen usar como una herramienta alternativa para describir visualmente la diversidad de una comunidad ya que ayudan a evaluar la complejidad de una comunidad y a partir de estas se pueden predecir cambios en respuesta a perturbaciones en el ambiente; ya que, de manera natural, las abundancias de las especies difieren en en el tiempo y espacio. A partir de estas gráficas, se pueden comprar poblaciones en un único momento temporal o a lo largo del tiempo (Meghan L., et al., 2019; Avolio et al., 2015). 
+
+El índice de Shannon puede aumentar si también lo hace la riqueza y/o la homogeneidad de abundancias en la muestra, aunque no se puede establecer de manera directa a cuál de estas se debe el incremento; por lo que es necesario que este índice sea descrito en conjunto con los valores de riqueza y abundancias de las especies observadas (Escalante, T., 2003; Jost, L. & González, J., 2012). Los índices que consideran tanto riqueza como abundancias en la diversidad alfa incluyen todos los índices calculados: Shannon, Simpson, el inverso de Simpson, Gini-Simpson y Chao1. No obstante, cada uno tiene distintas limitaciones, por lo que se utilizan de acuerdo con su enfoque, como el índice de Gini y la normalización de Pielou, que toman en cuenta la riqueza y la distribución de las especies, pero tienen un enfoque en la equidad de dicha distribución.  
+
+Esto mismo ocurre con Chao1, que considera ambas (riqueza y abundancia), pero está enfocado a la riqueza de las especies, donde es impactado por la presencia de especies raras en la población, lo cual resulta útil en el análisis de comunidades biológicas, ya que en lugar de considerar la riqueza entre muestras, la riqueza estimada es del total de la comunidad perteneciente a un muestreo, por lo que Chao1 es utilizado para calcular OTUs esperados de OTUs observados en una muestra (Kim et al., 2017).  En los índices de Chao1 calculados, se denota una diferencia entre el estimado por la función personalizada y el comando ` estimateR(pob1)["S.chao1",]`de la librería vegan. Aplicado a la población 1, el índice de Chao1 estimado por la función `chao1` es de 13, mientras que, al aplicar el comando, nos da un valor de 12.3, el cual es más cercano al valor real, puesto que la población 1 tiene una riqueza de 12. A pesar de esta diferencia, se procedió a calcular el índice con la función. 
+
+Chao1 es utilizado para corregir muestreos que resultaron insuficientes y es considerado un estimador simple, por lo que tiene una tendencia de subestimar la verdadera riqueza al contrario de estimadores más complejos, que tienden a sub y sobreestimar esta riqueza (Shmitz & Rahmann, 2024). Sin embargo, esta diferencia en los cálculos puede ser atribuida a factores como que los cálculos realizados por el comando específico en R son más complejos y exactos o por el redondeo.  
+
+En cuanto al índice de Shannon, cuando se aplicó `diversity(pob1, index = "shannon")` a la población 1, el valor fue de 2.11, que es el mismo valor obtenido al aplicar la función, por lo que podemos inferir que la fórmula utilizada para Shannon es aplicada más consistentemente a lo largo de distintas aplicaciones, mientras que un estimado de la riqueza, como Chao1 puede generar algunas variaciones que podrían ocurrir debido al manejo de los datos. 
+
+A partir de los diversos índices, también podemos evaluar el efecto que tiene la diferencia entre muestreos, pues las características de riqueza y abundancia dependen en gran medida de la metodología de muestreo. La riqueza se ve afectada por el tamaño de la muestra y está asociada a un error en su determinación, de tal forma que su incremento se ve beneficiado por el aumento en el tamaño de la muestra; de tal forma que en algunos casos puede estar mejor representada la diversidad alfa de la comunidad en general (Moreno, C., 2001; Carmona-Galindo V. & Carmona T., 2013). A partir de esto, podemos comprender un poco de la variación que existe entre los valores de los índices de diversidad de cada población. La diversidad alfa nos da un panorama sobre general sobre la población, mientras que la diversidad beta permite observar el recambio. Los índices como Jaccard, Sorensen o Simposon describen similitud y le dan prioridad a la riqueza basándose en la presencia/ausenicia, aunque la manejan diferente. Otros índices como el de Bray-Curtis dan resultados que nos da un resultado cuantitativo de la diferencia de las abundancias, no quedándose sólo con la riqueza que suele depender el esfuerzo de muestreo.
 
 ## Preguntas
 
-1.  
+1.  **¿Cómo varían los valores de los índices entre los sitios? ¿Qué diferencias resaltan?**
+
+En la diversidad alfa, la población 2 destaca por una mayor diversidad y equidad en la distribución de sus especies, según lo indicado por el índice de Shannon, normalizado por Pielou, esto es consistente con el índice de Simpson, donde dicha la población exhibe una menor probabilidad de seleccionar al azar individuos de la misma especie. Además, el valor indicado por el índice de Gini refleja que la población 2 posee la distribución más equitativa de las abundancias, seguido por las poblaciones 1 y 4. No obstante, la población 1 demuestra un mayor estimado de riqueza en el índice de Chao1. En contraste, las poblaciones 3 y 6 representan extremos donde la diversidad es nula, puesto que son poblaciones de una única especie, limitando la aplicación de ciertos índices para la medición según Pielou y Chao1.
+
+Las poblaciones con más similitud cambian según el índice que se aplique. Con el índece de Bray-Curtis, poblaciones que son similares en composición, similares con Jaccard, se hallan disimilares al considerar sus abundancias. Hay casos especiales y extremos como p3 y p6 donde predomina una especie y son disimilares ante ambos índices.
 
 2.  **¿Cuál índice es más sensible a especies raras?**
 
@@ -363,12 +509,49 @@ Para la diversidad alfa el índice de Pielou. Ayuda a representar la equidad, co
 
 Si se requiere la diversidad beta el índice de Bray-Curtis. Considera las abundancias de especies entre especies y aunque limita la riqueza a la calidad del muestreo, puede plasmar mejor qué tan diferente es una población respecto a otra que es lo que usualmente se busca con la diversidad porque no solo considera la composición.
 
-## Contribuciones
-
-Blanca Itzel Osornio Alvarez. Realizó las funciones para el análisis de diversidad beta. Matrices de distancias por pares. Contestó preguntas. Resultados. Discusión.
-
-Julieta González Herrera. Realizó las funciones para el análisis de diversidad alfa, hizo el data.frame con los índices. Redactó la introducción. Contestó preguntas. Resultados. Discusión.
-
-Lilith Gabriela Trinidad Martínez Aguirre. Preparó el csv de la base de datos. Realizó las curvas de rarefacción y rank-abundace. Contestó preguntas. Resultados. Discusión.
 
 ## Referencias
+
+Alcolado, P. M. (1998). Conceptos e índices relacionados con la diversidad. Instituto de Oceanología, 7-21. 
+
+Avolio, M., Komatsu, K., Houseman, G., Koerner, S., Grman, E., Isbell, F., Johnson, D., & Wilcox, K. (2015). A framework for quantifying the magnitude and variability of community responses to global change drivers. Ecosphere, 6, art280. https://doi.org/10.1890/ES15-00317.1.  
+
+Barona, D. (2021). Propiedades de los índices de equidad según su relación con atributos comunitarios. South Sustainability, 2(1), ac001-ac001. 
+
+Calderón-Patrón, J. M., Moreno, C. E., & Zuria, I. (2012). La diversidad beta: medio siglo de avances. Revista mexicana de biodiversidad, 83(3). https://doi.org/10.22201/ib.20078706e.2012.3.992  
+
+Carmona-Galindo, V. D., & Carmona, T. V. (2013). La Diversidad de los Análisis de Diversidad [The Diversity of Diversity Analyses]. Bioma. 
+
+Cleland, E. E. (2011) Biodiversity and Ecosystem Stability. Nature Education Knowledge 3(10):14 
+
+Escalante, T. (2003). ¿Cuántas especies hay? Los estimadores no paramétricos de Chao. Elementos, 1(52), 53-56. 
+
+Holt, R. D. (2013). Species Coexistence. En S. A. Levin (Ed.), Encyclopedia of Biodiversity (Second Edition) (pp. 667-678). Academic Press. https://doi.org/10.1016/B978-0-12-384719-5.00025-3 
+
+Jost, L. & González, J. (2012). Midiendo la diversidad biológica: más allá del índice de Shannon. Acta zoológica lilloana, 3-14. 
+
+Kim, B.-R., Shin, J., Guevarra, R. B., Lee, J. H., Kim, D. W., Seol, K.-H., Lee, J.-H., Kim, H. B., & Isaacson, R. E. (2017). Deciphering diversity indices for a better understanding of microbial communities. Journal of Microbiology and Biotechnology, 27(12), 2089–2093. https://doi.org/10.4014/jmb.1709.09027 
+
+Kitikidou, K., Milios, E., Stampoulidis, A., Pipinis, E., & Radoglou, K. (2024). Using biodiversity indices effectively: Considerations for forest management. Ecologies, 5(1), 42–51. https://doi.org/10.3390/ecologies5010003.  
+
+Lynch, D. (2021). Beta Diversity. One Codex. Onecodex.com. Recuperado el 9 de marzo de 2025, de https://docs.onecodex.com/en/articles/4150649-beta-diversity.  
+
+Magurran, A. E. (1988). Diversity indices and species abundance models. En A. E. Magurran (Ed.), Ecological Diversity and Its Measurement (pp. 7-45). Springer Netherlands. https://doi.org/10.1007/978-94-015-7358-0_2.  
+
+Meghan L. Avolio, Ian T. Carroll, Scott L. Collins, Gregory R. Houseman, Lauren M. Hallett, Forest Isbell, Sally E. Koerner, Kimberly J. Komatsu, Melinda D. Smith, Kevin R. Wilcox (2019). A comprehensive approach to analyzing community dynamics using rank abundance curves. Ecosphere, 10(10). https://doi.org/10.1002/ecs2.2881.  
+
+Moreno, C., Barragán, F., Pineda, E., & Pavón, N. P. (2011). Reanálisis de la diversidad alfa: alternativas para interpretar y comparar información sobre comunidades ecológicas. Revista mexicana de biodiversidad, 82(4), 1249-1261.  
+
+Moreno, C. E. (2001). Métodos para medir la biodiversidad Claudia E. Moreno. M&T–Manuales y Tesis SEA, 1(Ed.1). Zaragoza, pp 1-84. 
+
+Schmitz, J. E., & Rahmann, S. (2024). A review and evaluation of species richness estimation. En bioRxiv. https://doi.org/10.1101/2024.10.09.615408 
+
+Xu S, Böttcher L, Chou T. Diversity in biology: definitions, quantification and models. Phys Biol. 2020 Mar 19;17(3):031001. doi: 10.1088/1478-3975/ab6754. PMID: 31899899; PMCID: PMC8788892. 
+
+##Contribuciones
+
+*Blanca Itzel Osornio Alvarez.* Realizó las funciones para el análisis de diversidad beta. Matrices de distancias por pares. Contestó preguntas. Resultados. Discusión.  
+
+*Julieta González Herrera.* Realizó las funciones para el análisis de diversidad alfa, hizo el data.frame con los índices. Redactó la introducción. Contestó preguntas. Resultados. Discusión. 
+
+*Lilith Gabriela Trinidad Martínez Aguirre.* Preparó el csv de la base de datos. Realizó las curvas de rarefacción y rank-abundace. Contestó preguntas. Resultados. Discusión. 
