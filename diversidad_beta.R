@@ -111,19 +111,58 @@ library(vegan)
 
 #Filtrar
 
-data2<-data[ ,c(2:13)]
-data2
+datos<-data[ ,c(2:13)]
+datos
 
 #Matriz
-bd <- vegdist(data2, method = "bray")
+bd <- vegdist(datos, method = "bray")
 bd
 
-##pre
-data3<-split(data2, 1:nrow(data2))##tengo una lista
-data3
-class(data3)
+datos
 
-###Especies comunes
+###Subconjuntos
+a<-datos[1, ]
+b<-datos[2, ]
+c<-datos[3, ]
+d<-datos[4, ]
+e<-datos[5, ]
+f<-datos[6, ]
+g<-datos[7, ]
+class(a)#data frame
+c
+###pre
+comunes<-names(datos)[c>0 & a>0]
+comunes
+ab_min_com<-sum(pmin(c[comunes],a[comunes]))
+ab_min_com
 
-data3$`1`>0 & data3$`2` >0->com
+numerador<-2*ab_min_com
+numerador
+
+denominador<-sum(a)+sum(c)
+denominador
+
+brayc<-numerador/denominador
+brayc
+
+bray_curtis<-function(x,y){#Dado el conjunto x y el conjunto y
+  comunes<-names(datos)[x>0 & y>0]
+  ab_min_com<-sum(pmin(x[comunes],y[comunes]))
+  numerador<-2*ab_min_com
+  denominador<-sum(x)+sum(y)
+  brayc<-numerador/denominador
+  print(brayc)
+}
+bray_curtis(d,e)
+#Hacer la matriz en blanco
+
+mat_bc<-matrix(0,nrow = 7,ncol = 7)
+mat_bc
+
+rownames(mat_bc)<-c("p1","p2","p3","p4","p5","p6","p7")
+colnames(mat_bc)<-c("p1","p2","p3","p4","p5","p6","p7")
+mat_bc
+
+
+
 
