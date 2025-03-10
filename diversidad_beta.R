@@ -154,8 +154,12 @@ bray_curtis<-function(x,y){#Dado el conjunto x y el conjunto y
   print(brayc)
 }
 bray_curtis(d,e)
-#Hacer la matriz en blanco
 
+
+
+
+
+#Hacer la matriz en blanco
 mat_bc<-matrix(0,nrow = 7,ncol = 7)
 mat_bc
 
@@ -163,6 +167,28 @@ rownames(mat_bc)<-c("p1","p2","p3","p4","p5","p6","p7")
 colnames(mat_bc)<-c("p1","p2","p3","p4","p5","p6","p7")
 mat_bc
 
+
+mnatriz_bray <- function(){
+  mat_bc<-matrix(0,nrow = 7,ncol = 7)
+  mat_bc
+  
+  for (x in 1:7) {
+    subconjunto<-datos[x, ]
+    print(subconjunto)
+
+    for (y in 1:7) {
+    
+      subconjunto2 <- datos[y, ]
+      subconjunto2
+      
+      indice <- bray_curtis(subconjunto,subconjunto2)
+    
+      mat_bc[x,y] <- indice
+    
+      print(mat_bc)
+       }
+  }
+}
 
 
 
