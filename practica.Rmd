@@ -110,6 +110,8 @@ for (x in 1:7) {
 }
 ```
 
+A partir de solo las curvas, podemos suponer que la población con mayor diversidad es la cuatro y cinco, en las que la caída no es tan drástica; mientras que las población tres y seis no hay diversidad y en la uno y siete es baja.
+
 ### *Índices de diversidad beta*
 
 ## Discusión y conclusión
