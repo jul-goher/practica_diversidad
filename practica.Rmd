@@ -1,5 +1,119 @@
 ---
-title: "practica"
+title: "Análisis de Diversidad de Especies en Sitios Simulados"
+author: "Blanca Itzel Osornio Alvarez, Julieta González Herrera & Lilith Gabriela Trinidad Martinez Aguirre"
+date: "2025-03-10"
 output: html_document
 ---
 
+## Introducción
+
+La diversidad es una medida de variación aplicado en diversas disciplinas, incluyendo ecología, sociología y biología, donde coincide ser una medida que provee un rango y distribución de ciertas características dentro de una determinada población (Xu et al., 2020). Por esto, desde un punto de vista ecológico, se toma en cuenta el número de especies presentes y la identidad de dichas especies en una comunidad biológica. Esto se realiza mediante el uso de índices de diversidad, que juegan un papel crucial en el estudio de las comunidades, ya que proveen una herramienta para entender la riqueza y distribución de las especies en el sistema biológico. Tanto la riqueza como la distribución son relevantes para un análisis integral de la diversidad, ya que las especies difieren entre sí por la manera en la que interactúan con el ambiente, como el uso de recursos, convirtiéndose en clave para el funcionamiento y estabilidad del ecosistema (Cleland, 2011).
+
+Los índices varían dependiendo del contexto en el que quieran aplicarse, lo cual es determinado por el tipo de diversidad con el que se vaya a trabajar. Dentro de las diversidades descritas se habla de la diversidad dentro del hábitat (α) y la diversidad entre hábitats (β), donde este último es considerado como un índice de cambio de la diversidad (Calderón-Patrón, 2012).  
+
+## Objetivos
+
+-   Analizar la estructura de las comunidades con gráficos de abundancias ordenadas.
+
+-   Calcular la diverisidad alfa y la diversidad entre sitios utilizando medidas de diversidad beta.
+
+-   Interpretar los patrones de diversidad observados y su significado ecológico.
+
+## Materiales y métodos
+
+-   7 bolsas con fichas de colores.
+
+1.  Mide la diversidad alfa con los índices Shannon, Pielou, Simpson, Simpson inverso, Gini, y Chao1.
+2.  Encuentra la curva de rarefacción para cada sitio.
+3.  Calcula la gráfica de abundancias-ordenadas (rank-abundance) para cada sitio.
+4.  Calcula la diversidad beta de todas las parejas de sitios utilizando los índices de: Jaccard y Bray-Curtis.
+5.  Construye una matriz de diferencias (distancias) para cada medida.
+6.  Discute tus resultados, es decir, interpreta lo que te sale en términos de esas medidas. Es decir, interpretar los patrones de diversidad y su significado ecológico.
+7.  Todas las gráficas que hagas debes estar hechas en ggplot2 e incluir el código.
+8.  Hacer el reporte debe ser un RMarkdown, dentro de un Rproject.
+
+Extra: Hacer un script de R que partir de datos como los que recopilaron calcule todo lo anterior.
+
+## Resultados
+
+### *Curvas de rarefacción*
+
+A partir de estas, logramos notar que en algunos casos fue más rápido llegar a la asíntota que en otros y, en la mayoría de los casos, se observó en aquellas poblaciones que tenían la riqueza más baja. Las poblaciones de mayor tamaño y riqueza fueron las que requirieron de un mayor número de muestreos.
+
+Para las poblaciones con una riqueza \>1, en el segundo muestreo aún se lograban encontrar nuevas especies y, a partir del tercero, es donde ya se iban encontrando menos especies y en algunos casos se llegaba a la asíntota. Las poblaciones con únicamente una especie se mantuvieron en línea recta debido a que no hay un aumento o descubrimiento de nuevas especies.
+
+```{r Curva de rarefacción, echo=FALSE, message=FALSE, warning=FALSE}
+library(ggplot2) 
+library(tidyr) 
+library(dplyr) 
+
+# Cargar base de datos
+datos <- read.csv("data/datos.csv")
+
+# Seleccion de solo los datos de muestreos
+muestreos <- datos[ ,c(1,16:25)] 
+# Invertir el orden de las columnas y renglones 
+muestreos2 <- as.data.frame(t(muestreos[ , c(2:11)]))
+# Renombrar columnas de acuerdo a la pob a la que corresponden
+colnames(muestreos2) <- c(muestreos$poblacion) 
+# Agregar una columna para numero de muestreo
+muestreos2$muestreo <- c(1:10)
+
+muestreos_prueba <- muestreos2 %>% 
+  pivot_longer(cols = starts_with("P"), # Selec. todas las col que empiezan con P 
+               names_to = "poblacion", # Poblacion
+               values_to = "riqueza") # Sp
+# Conservar unicamente los valores >0
+muestreos_prueba <- muestreos_prueba[muestreos_prueba$riqueza > 0, ]
+
+# CURVA DE RAREFACCIÓN
+rarefac <- ggplot(muestreos_prueba, aes(x = muestreo, y = riqueza, color = poblacion)) +
+  geom_point() +  # Puntos
+  geom_line() + # Union de los puntos por lineas rectas
+  geom_smooth(method = "loess", se = FALSE) + # Ajuste de los puntos a una curva
+  labs(title = "Curva de rarefacción", x = "Muestreos", y = "Riqueza") + # Nomb de ejes y graf
+  theme_minimal() # Estilo de la graf
+
+print(rarefac)
+
+```
+
+### *Ídices de diversidad alfa*
+
+### *Curvas de rango-abundancia*
+
+Con estas gráficas podemos notar la heterogeneidad en cuanto a las abundancias de cada especie y la riqueza en la población. En la población uno y siete podemos encontrar un patrón muy similar en el que una de las especies tiene el mayor número de individuos mientras que el resto poseen un número bastante bajo y en el que muchas de ellas son especies con uno o dos individuos. La población dos, en conjunto con las anteriormente mencionadas, tiene una curva de abundancia similar, en las que se observa que las abundancias entre la mayoría de las especies son muy cercanas, aunque bajo (igual y por debajo de cinco); sin embargo, es importante considerar que estás presentan un alto valor de riqueza y un tamaño por debajo del promedio.
+
+En la gráfica correspondiente a la población cuatro se puede notar una zona estable al inicio de la curva, donde se ve una asíntota, en la que podemos observar especies con una misma abundancia (especie 2, 3 y 4) y cercano a esta hay otras con un valor bastante cercano (1 y 5), aunque ya para resto de especies se nota una inclinación (caída) muy pronunciada, debido a la gran baja de individuos. En el caso de la población tres y seis únicamente notamos un punto, debido a que solo tienen una especie y pueden ser ambientes dominados por estas.
+
+```{r Rank-abundance, echo=TRUE, message=FALSE, warning=FALSE}
+for (x in 1:7) {
+  spp1 <- datos[x,c(1:14)] # Seleccionar poblacion
+  spp1.1 <- as.data.frame(t(spp1[2:13])) # Cambiar orden de los valores
+  colnames(spp1.1) <- "Abundancia" # Nombrar col
+  
+  spp1.1 <- spp1.1 %>%
+    arrange(desc(Abundancia)) # Ordenar de forma decreciente
+  
+  spp1.1$spp <- c(1:length(spp1.1$Abundancia)) # Numerar spp
+  
+  spp1.1 <- spp1.1[spp1.1$Abundancia != 0, ] # Quitar spp NO presentes
+  
+  
+  rank_ab <- ggplot(spp1.1, aes(x = spp, y = Abundancia, colour = spp)) +
+    geom_point() +  # Puntos
+    geom_line() + # Linea de union
+    labs(title = "Rank-abundance", x = "Spp", y = "Abundancia")
+  print(rank_ab)
+}
+```
+
+### *Índices de diversidad beta*
+
+## Discusión y conclusión
+
+## Preguntas
+
+## Contribuciones
+
+## Referencias
