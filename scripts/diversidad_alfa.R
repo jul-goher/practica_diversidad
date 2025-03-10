@@ -165,7 +165,7 @@ pob7_chao <- chao1(pob7)
 #Puse as.numeric porque creo que lo tomaba en cuenta como un vector aún y salían 7 columnas por cada index, en vez de 7 rows
 
 indices_alpha <- data.frame( 
-  poblaciones = c("P1", "P2", "P3", "P4", "P5", "P6", "P7"), 
+  poblacion = c("P1", "P2", "P3", "P4", "P5", "P6", "P7"), 
   
   shannon = as.numeric (c (pob1_shan$shannon, pob2_shan$shannon, pob3_shan$shannon, pob4_shan$shannon,
                            pob5_shan$shannon, pob6_shan$shannon, pob7_shan$shannon) ), 
