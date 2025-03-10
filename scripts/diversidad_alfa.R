@@ -1,6 +1,6 @@
 ##########  Datos a tabla
 
-#Diversidad de Shannon, ajuste de Pielou
+#Diversidad de Shannon, normalización de Pielou
 shan_pielou <- function(x) { {
   n <- length(x)
   total <- sum(x)
@@ -23,7 +23,7 @@ shan_pielou <- function(x) { {
 
 }
 
-#Diversidad de Simpson 
+#índice de Simpson 
 simpson <- function (x) {
   N <- sum(x)
   simpson <- 0
@@ -49,7 +49,7 @@ simpson <- function (x) {
 }
 
 
-#Diversidad de CHAO1
+#índice de CHAO1
 chao1 <- function (x) {
   s_obs <- length (x)
   f1 <- sum (x == 1)
