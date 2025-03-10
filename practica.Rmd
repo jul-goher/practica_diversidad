@@ -86,6 +86,8 @@ Con estas gráficas podemos notar la heterogeneidad en cuanto a las abundancias 
 
 En la gráfica correspondiente a la población cuatro se puede notar una zona estable al inicio de la curva, donde se ve una asíntota, en la que podemos observar especies con una misma abundancia (especie 2, 3 y 4) y cercano a esta hay otras con un valor bastante cercano (1 y 5), aunque ya para resto de especies se nota una inclinación (caída) muy pronunciada, debido a la gran baja de individuos. En el caso de la población tres y seis únicamente notamos un punto, debido a que solo tienen una especie y pueden ser ambientes dominados por estas.
 
+En todas las poblaciones con más de una especie, notamos que la mayoria de las especies presentes son raras (que destacan en la gráfica por el color azul mas claro), es decir, que son poco abundantes (distribuciones de cola larga).
+
 ```{r Rank-abundance, echo=TRUE, message=FALSE, warning=FALSE}
 for (x in 1:7) {
   spp1 <- datos[x,c(1:14)] # Seleccionar poblacion
